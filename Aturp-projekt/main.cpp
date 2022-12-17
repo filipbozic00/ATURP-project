@@ -107,66 +107,138 @@ void DrawGraph(vector<pair<double, double> >results, int intervalLength)
     outFile.close();
 }
 
-vector<pair<int, int> >  floatToInt(vector<pair<double, double> > results) {
-        vector<pair<int, int> > roundResults;
-        int x, y = 0;
-        for (const auto &pair: results) {
-            x = int(pair.first*10);
-            y = int(pair.second*10);
-            roundResults.push_back(make_pair(x, y));
-            //cout<<x<< "->"<<y<<endl;
-    }
-    return roundResults;
+vector<pair<int, int> >  DoubleToInteger(vector<pair<double, double> > results) {
+	vector<pair<int, int> > roundResults;
+	int x, y = 0;
+	for (const auto& result : results) {
+		x = int(result.first * 10);
+		y = int(result.second * 10);
+		roundResults.push_back(make_pair(x, y));
+		//cout<< x << "->" << y <<endl;
+	}
+	return roundResults;
 }
 
-int findSmallest(vector<pair<int, int> >items) {
-    int saveIndex = 0;
-    for(int i = 1; i < items.size(); i++)
+int FindLowestY(vector<pair<int, int> >items) {
+	int index = 0;
+	for (int i = 1; i < items.size(); i++)
+	{
+		if (items[index].second > items[i].second)
+			index = i;
+	}
+	return items[index].second;
+}
+
+int FindHighestY(vector<pair<int, int> >items) {
+	int index = 0;
+	for (int i = 1; i < items.size(); i++)
+	{
+		if (items[index].second < items[i].second)
+			index = i;
+	}
+	return items[index].second;
+}
+
+bool IsFlatLine(vector<pair<int, int> >results)
 {
-    if(items[saveIndex].second > items[i].second)
+    int index = 0;
+    for (int i = 1; i < results.size(); i++)
     {
-        saveIndex = i;
+        if (results[index].second != results[i].second)
+            return false;
     }
+    return true;
 }
 
-return items[saveIndex].second;
-}
-
-int findBiggest(vector<pair<int, int> >items) {
-    int saveIndex = 0;
-    for(int i = 1; i < items.size(); i++)
+bool IsPointAtGraph(vector<pair<int, int> > roundResults, int x, int y, vector<double>& coeffiecients, int n)
 {
-    if(items[saveIndex].second < items[i].second)
+    // for (int k = roundResults.size() - 1; k >= 0; k--)
+    //     if (i == roundResults[k].first && j == roundResults[k].second)
+    //         return true;
+    //return false;
+    double xDouble = (double)x; double yDouble = (double)y; //cast x and y to double
+    double xDecimal = 0, yDecimal = 0;
+    if(x != 0) 
+        xDecimal = xDouble / 10; //convert x to decimal
+    if(y != 0) 
+        yDecimal = yDouble / 10; //convert y to decimal
+    double equationResult = 0;
+    if (n == 3)
+        equationResult = coeffiecients[0] * pow(xDecimal, 3) + coeffiecients[1] * pow(xDecimal, 2) + coeffiecients[2] * xDecimal + coeffiecients[3];
+    else if (n == 2)
+        equationResult = coeffiecients[0] * pow(xDecimal, 2) + coeffiecients[1] * xDecimal + coeffiecients[2];
+    else if (n == 1)
+        equationResult = coeffiecients[0] * xDecimal + coeffiecients[1];
+    else if (n == 0)
+        equationResult = coeffiecients[0];
+
+    int yResult = int(equationResult * 10); //cast again to integer
+    if (yResult > y) //if the result from the equation is bigger than the original y from some coordinate on that interval T(x, y) than that point is ON or UNDER the graph
+        return true;
+    else
+        return false;
+}
+
+void DrawOnePointGraph()
+{
+    for (int i = 0; i < 3; i++)
     {
-        saveIndex = i;
+        for (int j = 0; j < 1; j++)
+            cout << ".";
+        cout << endl;
     }
+
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 1; j++)
+            cout << "#";
+        cout << endl;
+    }
+    exit(0);
 }
 
-return items[saveIndex].second;
+void DrawFlatGraph(int intervalLength)
+{
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j <= intervalLength; j++)
+            cout << ".";
+        cout << endl;
+    }
 
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j <= intervalLength; j++)
+            cout << "#";
+        cout << endl;
+    }
+    exit(0);
 }
 
-bool isCordinate(vector<pair<int, int> > roundResults, int i, int j) {
-    for (int k = roundResults.size() - 1; k >= 0; k--)
-        if (i == roundResults[k].first && j == roundResults[k].second)
-            return true;
-   return false;
-}
-
-void draw(vector<pair<double, double> >results, int intervalLength, int rInterval, int lInterval) {
-    vector<pair<int, int> > roundResults = floatToInt(results);
-    int yMin = findSmallest(roundResults);
-    int yMax = findBiggest(roundResults);
-    cout<< yMin << ", "<< yMax << endl;
+void Draw(vector<pair<double, double> >results, int intervalLength, int rInterval, int lInterval, vector<double>& coeffiecients, int n) {
+    vector<pair<int, int> > roundResults = DoubleToInteger(results);
+    int yMin = FindLowestY(roundResults);
+    int yMax = FindHighestY(roundResults);
+    //cout<< yMin << ", "<< yMax << endl;
 
     int i = 0;
     int j = 0;
 
+    if (roundResults.size() == 1)
+        DrawOnePointGraph();
+    if (IsFlatLine(roundResults))
+        DrawFlatGraph(intervalLength);
+
     //for(i = yMax; i>=yMin; i--) {
-    for(i = yMin; i<=yMax; i++) {
+    //if (yMin > 0)
+    //    yMin += 3;
+    //else
+    //    yMin -= 3;
+
+    for(i = yMax; i>=yMin; i--) {
 
         for(j = lInterval; j<=rInterval; j++) {
-            if(isCordinate(roundResults, j, i))
+            if(IsPointAtGraph(roundResults, j, i, coeffiecients, n))
                 cout << "#";
             else
                 cout << ".";
@@ -179,13 +251,18 @@ void draw(vector<pair<double, double> >results, int intervalLength, int rInterva
 void CalculatePolynom(double l, double r, int n, vector<double>& coeffiecients)
 {
     int intervalLenght = abs(r - l) * 10;
-    if (intervalLenght == 0)
-        intervalLenght++;
     double equationResult;
     double x = l;
     vector<pair<double, double> >results;
-    for (int i = 0; i < intervalLenght; i++)
+  
+    for (int i = 0; i <= intervalLenght; i++)
     {
+        if (intervalLenght == 0 && coeffiecients.size() > 0)
+        {
+            equationResult = coeffiecients[0];
+            results.push_back(make_pair(x, equationResult));
+            break;
+        }
         if (n == 3)
         {
             equationResult = coeffiecients[0] * pow(x, 3) + coeffiecients[1] * pow(x, 2) + coeffiecients[2] * x + coeffiecients[3];
@@ -203,32 +280,32 @@ void CalculatePolynom(double l, double r, int n, vector<double>& coeffiecients)
             equationResult = coeffiecients[0];
         }
         results.push_back(make_pair(x, equationResult));
+        //if (i == intervalLenght-1)
+        //    x += 0.01;
+        //else
         x += 0.1;
     }
-    PrintPairVector(results);
 
     //DrawGraph(results, intervalLenght);
-    draw(results, intervalLenght, (r*10), (l*10));
+    Draw(results, intervalLenght, (r*10), (l*10), coeffiecients, n);
     //return results;
 }
 
-//int main(int argc, char* argv[])
-int main()
+int main(int argc, char* argv[])
+//int main()
 {
     //preberi vhodne podatke
-    ifstream infile("/Users/filipbozic/Documents/untitled folder/CompetitiveProgramming/pot_v_fx/11.in");
-
+    //ifstream infile("C:\\Users\\icovi\\OneDrive\\Desktop\\College\\2022-2023\\ATURP\\Seminarska_naloga\\Pot_v_f(x)\\Debug\\testne_primere\\12.in");
+    ifstream infile(argv[1]);
     string l, r, n, polynomDegree;
     vector<double>coefficients;
     infile >> l >> r >> n;
     while (infile >> polynomDegree)
         coefficients.push_back(stod(polynomDegree));
 
-    PrintVector(coefficients);
+    //PrintVector(coefficients);
 
     CalculatePolynom(stod(l), stod(r), stoi(n), coefficients);
-    //PrintPairVector(results);
 
-    //PrintVector(results);
 }
 
