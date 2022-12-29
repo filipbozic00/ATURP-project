@@ -210,46 +210,6 @@ void Draw(vector<pair<double, double> >results, int intervalLength, int rInterva
     DrawSharpOrPoint(true, intervalLength);
 }
 
-//void CalculatePolynom(double l, double r, int n, vector<double>& coeffiecients)
-//{
-//    int intervalLenght = round(abs(r - l) * 10);
-//    //int intervalLenght = abs(r - l) * 10;
-//
-//    double equationResult;
-//    double x = l;
-//    vector<pair<double, double> >results;
-//
-//    for (int i = 0; i <= intervalLenght; i++)
-//    {
-//        if (intervalLenght == 0 && coeffiecients.size() > 0)
-//        {
-//            equationResult = coeffiecients[0];
-//            results.push_back(make_pair(x, equationResult));
-//            break;
-//        }
-//        if (n == 3)
-//        {
-//            equationResult = coeffiecients[0] * pow(x, 3) + coeffiecients[1] * pow(x, 2) + coeffiecients[2] * x + coeffiecients[3];
-//        }
-//        else if (n == 2)
-//        {
-//            equationResult = coeffiecients[0] * pow(x, 2) + coeffiecients[1] * x + coeffiecients[2];
-//        }
-//        else if (n == 1)
-//        {
-//            equationResult = coeffiecients[0] * x + coeffiecients[1];
-//        }
-//        else if (n == 0)
-//        {
-//            equationResult = coeffiecients[0];
-//        }
-//        results.push_back(make_pair(x, equationResult));
-//        x += 0.1;
-//    }
-//
-//    Draw(results, intervalLenght, (r*10), (l*10), coeffiecients, n);
-//}
-
 void CalculatePolynom(double l, double r, int n, vector<double>& coeffiecients)
 {
     int intervalLenght = round(abs(r - l) * 10);
@@ -258,7 +218,7 @@ void CalculatePolynom(double l, double r, int n, vector<double>& coeffiecients)
     double x = l;
     vector<pair<double, double> >results;
 
-    for (int i = 0; i < intervalLenght; i++) {
+    for (int i = 0; i <= intervalLenght; i++) {
 
         double tempRez = coeffiecients[0];
 
@@ -281,8 +241,7 @@ int main(int argc, char* argv[])
 {
     //PrintMemoryUsage();
 
-    //ifstream infile(argv[1]);
-    ifstream infile("/Users/filipbozic/Documents/untitled folder/CompetitiveProgramming/pot_v_fx/41.in");
+    ifstream infile(argv[1]);
     int a = 1;
     string l, r, n, polynomDegree;
     vector<double>coefficients;
@@ -293,4 +252,3 @@ int main(int argc, char* argv[])
     CalculatePolynom(stod(l), stod(r), stoi(n), coefficients);
     PrintMemoryUsage();
 }
-
